@@ -90,9 +90,23 @@
 
         td:nth-child(2),
         th:nth-child(2) {
-            max-width: 500px;
+            max-width: 450px;
             
         }
+        td:nth-child(3),
+        td:nth-child(4),
+        td:nth-child(5),
+        td:nth-child(8),
+        th:nth-child(3),
+        th:nth-child(4),
+        th:nth-child(5),
+        th:nth-child(8) {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
 
         tr.expander-row {
             height: auto;
@@ -224,7 +238,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const apiUrl = "https://script.google.com/macros/s/AKfycbwZ1yAyEageVHdB5DJjGEiHrX8A22UTBi3xiKkLnBx7_5P37HToiLtn3gcpejrIzK4zuQ/exec";
+            const apiUrl = "https://script.google.com/macros/s/AKfycbybgom5FAwHtJ5u6kyjnvMObEWVTWKF3ESP6vBOW4K0Bz0F6xDemz4crqDlwTjgsNaxGg/exec";
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
@@ -259,6 +273,7 @@
                                     ? (() => {
                                         const today = new Date().toISOString().split('T')[0];
                                         return task.activatedSteps.stepDueDate.map(dateStr => {
+                                            if (!dateStr) return "-"
                                             const dateOnly = dateStr.split(' ')[0];
                                             const isPastDue = dateOnly < today;
                                             return isPastDue
@@ -295,6 +310,7 @@
                                 <div class="expander-content">
                                     <div class="expander-header">
                                         <div class="info-item shorts"><b>Made On:</b> ${task.createdAt}</div>
+                                        <div class="info-item shorts"><b>Subtask:</b> ${task.subtaskCreated ? `(${task.subtaskCompleted || 0}/${task.subtaskCreated || 0}) done` : "N/A"}</div>
                                         <div class="info-item detail"><b>Detail:</b> ${task.description}</div>
                                         <div class="info-item shorts">
                                             Prd Link: ${task.prdLink ? `<a href="${task.prdLink}" title="PRD Link" target="_blank">🔗 PRD</a>` : "<b>N/A</b>"}
