@@ -91,8 +91,9 @@
         td:nth-child(2),
         th:nth-child(2) {
             max-width: 450px;
-            
+
         }
+
         td:nth-child(3),
         td:nth-child(4),
         td:nth-child(5),
@@ -217,7 +218,7 @@
             background-color: transparent;
         }
 
-        .donetask{
+        .donetask {
             color: #48a648;
         }
     </style>
@@ -226,22 +227,24 @@
 <body>
 
     <h3>Task Overview</h3>
-
     <div class="table-container">
         <div class="scrollable-body">
             <table id="taskTable">
                 <thead> </thead>
-                <tbody> </tbody>
+                <tbody></tbody>
             </table>
         </div>
     </div>
+    <h5 id="loadingRow" style="padding-top: 30px; text-align: center; font-weight: normal;">Loading Data...</h5>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const apiUrl = "https://script.google.com/macros/s/AKfycbybgom5FAwHtJ5u6kyjnvMObEWVTWKF3ESP6vBOW4K0Bz0F6xDemz4crqDlwTjgsNaxGg/exec";
+            const apiUrl = "https://script.google.com/macros/s/AKfycbwMBiY-eFUwSC_aC3MZ0RHcTaVxfKc9jlj8AU00Hfl_7jE54CMvMyxrauCiMkIhx4ds8w/exec";
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
+                    document.getElementById("loadingRow")?.remove();
+
                     const tableHead = document.querySelector("#taskTable thead");
                     tableHead.innerHTML = `
                         <tr>
@@ -262,26 +265,25 @@
                     data.forEach(task => {
                         const taskRow = document.createElement("tr");
                         taskRow.innerHTML = `
-                            <td class="${task.isDone? 'donetask': ''}">${task.id}</td>
+                            <td class="${task.isDone ? 'donetask' : ''}">${task.id}</td>
                             <td>${task.title}</td>
                             <td>${task.owner}</td>
                             <td>${task.feDev || "-"}</td>
                             <td>${task.beDev || "-"}</td>
                             <td><b>${task.activatedSteps.step.join('<br>') || "-"}</b></td>
-                            <td>${
-                                task.activatedSteps.stepDueDate.length
-                                    ? (() => {
-                                        const today = new Date().toISOString().split('T')[0];
-                                        return task.activatedSteps.stepDueDate.map(dateStr => {
-                                            if (!dateStr) return "-"
-                                            const dateOnly = dateStr.split(' ')[0];
-                                            const isPastDue = dateOnly < today;
-                                            return isPastDue
-                                                ? `<span style="color: goldenrod;">${dateOnly}</span>`
-                                                : dateOnly;
-                                        }).join('<br>');
-                                    })()
-                                    : "-"
+                            <td>${task.activatedSteps.stepDueDate.length
+                                ? (() => {
+                                    const today = new Date().toISOString().split('T')[0];
+                                    return task.activatedSteps.stepDueDate.map(dateStr => {
+                                        if (!dateStr) return "-"
+                                        const dateOnly = dateStr.split(' ')[0];
+                                        const isPastDue = dateOnly < today;
+                                        return isPastDue
+                                            ? `<span style="color: goldenrod;">${dateOnly}</span>`
+                                            : dateOnly;
+                                    }).join('<br>');
+                                })()
+                                : "-"
                             }</td>
                             <td><b>${task.activatedSteps.doer.join('<br>') || "-"}</b></td>
                             <td>${task.releaseDueOn?.split(' ')[0] || "-"}</td>
@@ -309,12 +311,14 @@
                             <td colspan="10">
                                 <div class="expander-content">
                                     <div class="expander-header">
-                                        <div class="info-item shorts"><b>Made On:</b> ${task.createdAt}</div>
-                                        <div class="info-item shorts"><b>Subtask:</b> ${task.subtaskCreated ? `(${task.subtaskCompleted || 0}/${task.subtaskCreated || 0}) done` : "N/A"}</div>
+                                        <div class="info-item shorts"><b>Made On:</b> ${task.createdAt}
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Subtask:</b> ${task.subtaskCreated ? `(${task.subtaskCompleted || 0}/${task.subtaskCreated || 0}) done` : "N/A"}</div>
                                         <div class="info-item detail"><b>Detail:</b> ${task.description}</div>
                                         <div class="info-item shorts">
-                                            Prd Link: ${task.prdLink ? `<a href="${task.prdLink}" title="PRD Link" target="_blank">🔗 PRD</a>` : "<b>N/A</b>"}
-                                            &nbsp;&nbsp;&nbsp;Figma Link: ${task.figmaLink ? `<a href="${task.figmaLink}" title="Figma Link" target="_blank">🔗 Figma</a>` : "<b>N/A</b>"}
+                                            <b>PRD:</b> ${task.prdLink ? `<a href="${task.prdLink}" title="PRD" target="_blank">🔗 Link</a>` : "N/A"}
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Figma:</b> ${task.figmaLink ? `<a href="${task.figmaLink}" title="Figma" target="_blank">🔗 Link</a>` : "N/A"}
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>FE Doc:</b> ${task.feDocLink ? `<a href="${task.feDocLink}" title="FeDoc" target="_blank">🔗 Link</a>` : "N/A"}
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>BE Doc:</b> ${task.beDocLink ? `<a href="${task.beDocLink}" title="BeDoc" target="_blank">🔗 Link</a>` : "N/A"}
                                         </div>
                                     </div>
                                     <div class="steps-list">
