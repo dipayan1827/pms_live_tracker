@@ -79,35 +79,40 @@
             background-color: #f1f1f1;
         }
 
-        th:nth-child(2),
-        td:nth-child(2),
-        th:nth-child(5),
-        td:nth-child(5),
-        th:nth-child(8),
-        td:nth-child(8) {
+        th:nth-child(3),
+        td:nth-child(3),
+        th:nth-child(6),
+        td:nth-child(6),
+        th:nth-child(9),
+        td:nth-child(9) {
             border-right: 1px solid #ddd;
         }
 
-        td:nth-child(2),
-        th:nth-child(2) {
+        td:nth-child(3),
+        th:nth-child(3) {
             max-width: 450px;
 
         }
 
-        td:nth-child(3),
         td:nth-child(4),
         td:nth-child(5),
-        td:nth-child(8),
-        th:nth-child(3),
+        td:nth-child(6),
+        td:nth-child(9),
         th:nth-child(4),
         th:nth-child(5),
-        th:nth-child(8) {
+        th:nth-child(6),
+        th:nth-child(9) {
             max-width: 120px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
+        .expand-icon-td {
+            max-width: 40px;
+            padding-left: 20px;
+            padding-right: 0px;
+        }
 
         tr.expander-row {
             height: auto;
@@ -221,6 +226,9 @@
         .donetask {
             color: #48a648;
         }
+        .step-form-link{
+            color: #888;
+        }
     </style>
 </head>
 
@@ -239,7 +247,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const apiUrl = "https://script.google.com/macros/s/AKfycbwMBiY-eFUwSC_aC3MZ0RHcTaVxfKc9jlj8AU00Hfl_7jE54CMvMyxrauCiMkIhx4ds8w/exec";
+            const apiUrl = "https://script.google.com/macros/s/AKfycbx5Sgt6gvsTMNVqFyCP3eAA1VFEaHALM57Df4AWhQhnAViRcJm5BoogiCcB_0ym_hYE/exec";
             fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
@@ -248,6 +256,7 @@
                     const tableHead = document.querySelector("#taskTable thead");
                     tableHead.innerHTML = `
                         <tr>
+                            <th></th>
                             <th>Task ID</th>
                             <th>Title</th>
                             <th>Owner</th>
@@ -265,12 +274,17 @@
                     data.forEach(task => {
                         const taskRow = document.createElement("tr");
                         taskRow.innerHTML = `
+                            <td class="expand-icon-td ${task.isDone ? 'donetask' : ''}">▼</td>
                             <td class="${task.isDone ? 'donetask' : ''}">${task.id}</td>
                             <td>${task.title}</td>
                             <td>${task.owner}</td>
                             <td>${task.feDev || "-"}</td>
                             <td>${task.beDev || "-"}</td>
-                            <td><b>${task.activatedSteps.step.join('<br>') || "-"}</b></td>
+                            <td><b>${task.activatedSteps.step.map((step, i) => {
+                            const link = task.activatedSteps.form?.[i];
+                            return link ? `${step}&nbsp;&nbsp;&nbsp;<a class="step-form-link" href="${link}" target="_blank" title="Go to form">✎</a>` : step;
+                        }).join('<br>') || "-"
+                            }</b></td>
                             <td>${task.activatedSteps.stepDueDate.length
                                 ? (() => {
                                     const today = new Date().toISOString().split('T')[0];
@@ -290,7 +304,7 @@
                             <td>${task.releasedOn?.split(' ')[0] || "-"}</td>
                         `;
                         taskRow.style.cursor = "pointer";
-                        taskRow.addEventListener("click", () => {
+                        taskRow.querySelector("td:first-child").addEventListener("click", () => {
                             const allExpanders = document.querySelectorAll('.expander-content');
                             const currentExpander = taskRow.nextElementSibling.querySelector('.expander-content');
 
@@ -304,11 +318,10 @@
                         });
                         tableBody.appendChild(taskRow);
 
-                        // Add expander row
                         const expanderRow = document.createElement("tr");
                         expanderRow.classList.add("expander-row");
                         expanderRow.innerHTML = `
-                            <td colspan="10">
+                            <td colspan="11">
                                 <div class="expander-content">
                                     <div class="expander-header">
                                         <div class="info-item shorts"><b>Made On:</b> ${task.createdAt}
@@ -358,3 +371,13 @@
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
